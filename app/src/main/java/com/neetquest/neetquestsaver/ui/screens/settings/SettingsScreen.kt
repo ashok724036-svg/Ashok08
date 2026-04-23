@@ -242,8 +242,7 @@ fun SettingsItem(
     val textColor = if (isDestructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(16.dp)
-            .also { Modifier.clickable(onClick = onClick) },
+                modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
