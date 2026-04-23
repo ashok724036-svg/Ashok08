@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NEETQuestSaver</string>
+    <string name="floating_bubble_channel">Floating Bubble</string>
+    <string name="screen_capture_channel">Screen Capture</string>
+    <string name="bubble_notification_title">NEETQuestSaver Active</string>
+    <string name="bubble_notification_text">Tap the floating bubble to capture questions</string>
+    <string name="capture_notification_title">Capturing screen…</string>
+</resources>
