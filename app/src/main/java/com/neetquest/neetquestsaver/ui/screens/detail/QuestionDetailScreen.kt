@@ -94,10 +94,10 @@ fun QuestionDetailScreen(questionId: Long, navController: NavController, viewMod
             )
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (isEditing) {
-                    FormDropdown("Subject", editSubject, SUBJECTS) { editSubject = it }
-                    FormDropdown("Chapter", editChapter, chapters.filter{it.subject==editSubject}.map{it.name}) { editChapter = it }
-                    FormDropdown("Category", editCategory, categories.map{it.name}) { editCategory = it }
-                    FormDropdown("Difficulty", editDifficulty, DIFFICULTIES) { editDifficulty = it }
+                    isFormDropdown("Subject", editSubject, SUBJECTS, { editSubject = it })
+                    FormDropdown("Chapter", editChapter, chapters.filter{it.subject==editSubject}.map{it.name}, { editChapter = it })
+                    FormDropdown("Category", editCategory, categories.map{it.name}, { editCategory = it })
+                    FormDropdown("Difficulty", editDifficulty, DIFFICULTIES, { editDifficulty = it })
                     OutlinedTextField(value=editNotes, onValueChange={editNotes=it}, label={Text("Notes")},
                         modifier=Modifier.fillMaxWidth(), minLines=3, shape=RoundedCornerShape(12.dp))
                 } else {
