@@ -94,7 +94,7 @@ fun QuestionDetailScreen(questionId: Long, navController: NavController, viewMod
             )
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (isEditing) {
-                    isFormDropdown("Subject", editSubject, SUBJECTS, { editSubject = it })
+                    FormDropdown("Subject", editSubject, SUBJECTS, { editSubject = it })
                     FormDropdown("Chapter", editChapter, chapters.filter{it.subject==editSubject}.map{it.name}, { editChapter = it })
                     FormDropdown("Category", editCategory, categories.map{it.name}, { editCategory = it })
                     FormDropdown("Difficulty", editDifficulty, DIFFICULTIES, { editDifficulty = it })
