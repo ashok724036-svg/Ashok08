@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -71,6 +73,7 @@ val CATEGORIES_LIST = listOf("Important", "Tricky", "Repeated (PYQ)",
 @AndroidEntryPoint
 class SaveQuestionActivity : ComponentActivity() {
 
+    private var galleryBitmap: Bitmap? = null
     private var onGalleryResult: ((Bitmap?) -> Unit)? = null
 
     private val galleryLauncher = registerForActivityResult(
@@ -97,6 +100,7 @@ class SaveQuestionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Use cropped bitmap OR null (manual add from gallery)
         val bitmap = CropHolder.croppedBitmap
 
         setContent {
@@ -106,6 +110,7 @@ class SaveQuestionActivity : ComponentActivity() {
                     onPickGallery = { callback -> pickFromGallery(callback) },
                     onSaved = {
                         CropHolder.croppedBitmap = null
+                        // Go back to main app
                         val intent = Intent(this, MainActivity::class.java).apply {
                             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                         }
@@ -139,8 +144,10 @@ fun SaveFormScreen(
 
     val chaptersForSubject = CHAPTERS_MAP[subject] ?: emptyList()
 
+    // Reset chapter when subject changes
     LaunchedEffect(subject) { chapter = chaptersForSubject.firstOrNull() ?: "" }
 
+    // Navigate on save success
     LaunchedEffect(saveState.savedId) {
         if (saveState.savedId != null) {
             viewModel.resetSaveState()
@@ -201,6 +208,7 @@ fun SaveFormScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            // ── Image Preview ─────────────────────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth().height(180.dp),
                 shape = RoundedCornerShape(14.dp)
@@ -232,6 +240,7 @@ fun SaveFormScreen(
                 }
             }
 
+            // ── Subject ───────────────────────────────────────────────────────
             Text("Subject", style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -244,6 +253,7 @@ fun SaveFormScreen(
                 }
             }
 
+            // ── Chapter ───────────────────────────────────────────────────────
             FormDropdownSave(
                 label = "Chapter *",
                 value = chapter,
@@ -251,5 +261,94 @@ fun SaveFormScreen(
                 onValueChange = { chapter = it }
             )
 
+            // ── Category ──────────────────────────────────────────────────────
             FormDropdownSave(
-                label = "Category *
+                label = "Category *",
+                value = category,
+                options = CATEGORIES_LIST,
+                onValueChange = { category = it }
+            )
+
+            // ── Difficulty ────────────────────────────────────────────────────
+            Text("Difficulty", style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                DIFFICULTIES_LIST.forEach { diff ->
+                    FilterChip(
+                        selected = difficulty == diff,
+                        onClick = { difficulty = diff },
+                        label = { Text(diff) }
+                    )
+                }
+            }
+
+            // ── Tags ──────────────────────────────────────────────────────────
+            Text("Tags", style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(TAGS_LIST) { tag ->
+                    FilterChip(
+                        selected = tag in selectedTags,
+                        onClick = {
+                            selectedTags = if (tag in selectedTags)
+                                selectedTags - tag else selectedTags + tag
+                        },
+                        label = { Text(tag) }
+                    )
+                }
+            }
+
+            // ── Notes ─────────────────────────────────────────────────────────
+            OutlinedTextField(
+                value = notes,
+                onValueChange = { notes = it },
+                label = { Text("Notes (optional)") },
+                placeholder = { Text("Mnemonics, key points, tricks...") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 3,
+                maxLines = 6,
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            saveState.error?.let { err ->
+                Text(err, color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall)
+            }
+
+            Spacer(Modifier.height(8.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FormDropdownSave(
+    label: String,
+    value: String,
+    options: List<String>,
+    onValueChange: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+            modifier = Modifier.fillMaxWidth().menuAnchor(),
+            shape = RoundedCornerShape(12.dp)
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { opt ->
+                DropdownMenuItem(
+                    text = { Text(opt) },
+                    onClick = { onValueChange(opt); expanded = false },
+                    leadingIcon = if (opt == value) {
+                        { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) }
+                    } else null
+                )
+            }
+        }
+    }
+}
