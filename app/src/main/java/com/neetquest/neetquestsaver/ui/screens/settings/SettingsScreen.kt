@@ -73,7 +73,7 @@ fun SettingsScreen(
                 context.startActivity(intent)
             } else {
                 settingsViewModel.setBubbleEnabled(true)
-                FloatingBubbleService.startService(context)
+                FloatingBubbleService.start(context)
             }
         } else {
             settingsViewModel.setBubbleEnabled(false)
