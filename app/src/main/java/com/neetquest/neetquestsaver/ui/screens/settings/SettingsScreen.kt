@@ -77,7 +77,7 @@ fun SettingsScreen(
             }
         } else {
             settingsViewModel.setBubbleEnabled(false)
-            FloatingBubbleService.stopService(context)
+            FloatingBubbleService.stop(context)
         }
     }
 
