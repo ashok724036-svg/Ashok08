@@ -168,12 +168,13 @@ fun QuestionDetailScreen(
             // ── Meta info ─────────────────────────────────────────────────────
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (isEditing) {
-                    FormDropdown("Subject", editSubject, SUBJECTS) { editSubject = it }
+                     FormDropdown("Subject", editSubject, SUBJECTS, onValueChange = { editSubject = it })
                     FormDropdown("Chapter", editChapter,
-                        chapters.filter { it.subject == editSubject }.map { it.name }
-                    ) { editChapter = it }
+                        chapters.filter { it.subject == editSubject }.map { it.name },
+                        onValueChange = { editChapter = it })
                     FormDropdown("Category", editCategory,
-                        categories.map { it.name }) { editCategory = it }
+                        categories.map { it.name }, onValueChange = { editCategory = it })
+                    FormDropdown("Difficulty", editDifficulty, DIFFICULTIES, onValueChange = { editDifficulty = it })
                     FormDropdown("Difficulty", editDifficulty, DIFFICULTIES) { editDifficulty = it }
                     OutlinedTextField(
                         value = editNotes, onValueChange = { editNotes = it },
