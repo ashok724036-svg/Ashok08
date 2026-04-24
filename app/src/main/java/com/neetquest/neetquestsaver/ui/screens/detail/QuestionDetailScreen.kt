@@ -175,7 +175,7 @@ fun QuestionDetailScreen(
                     FormDropdown("Category", editCategory,
                         categories.map { it.name }, onValueChange = { editCategory = it })
                     FormDropdown("Difficulty", editDifficulty, DIFFICULTIES, onValueChange = { editDifficulty = it })
-                    FormDropdown("Difficulty", editDifficulty, DIFFICULTIES) { editDifficulty = it }
+                    
                     OutlinedTextField(
                         value = editNotes, onValueChange = { editNotes = it },
                         label = { Text("Notes") }, modifier = Modifier.fillMaxWidth(),
