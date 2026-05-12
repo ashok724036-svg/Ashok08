@@ -57,6 +57,8 @@ class FloatingBubbleService : Service() {
 
     override fun onDestroy() { removeBubble(); super.onDestroy() }
 
+    // ── Bubble ────────────────────────────────────────────────────────────────
+
     private fun addBubble() {
         if (bubbleView != null) return
 
@@ -98,6 +100,7 @@ class FloatingBubbleService : Service() {
                     true
                 }
                 MotionEvent.ACTION_UP -> {
+                    // ✅ FIX: Launch CaptureRequestActivity, NOT MainActivity
                     if (!moved) {
                         val intent = Intent(this, CaptureRequestActivity::class.java).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -116,6 +119,8 @@ class FloatingBubbleService : Service() {
         try { bubbleView?.let { windowManager.removeView(it) } } catch (_: Exception) {}
         bubbleView = null
     }
+
+    // ── Notification ──────────────────────────────────────────────────────────
 
     private fun createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
