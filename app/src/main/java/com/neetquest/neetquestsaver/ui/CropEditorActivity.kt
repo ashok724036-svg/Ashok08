@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
@@ -31,6 +32,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+// Shared bitmap between activities
 object CropHolder {
     var croppedBitmap: Bitmap? = null
 }
@@ -178,10 +180,12 @@ fun CropEditorScreen(
                         )
                     }
             ) {
+                // Draw screenshot
                 drawImage(imageBitmap, dstSize = IntSize(size.width.toInt(), size.height.toInt()))
 
                 val r = cropRect ?: return@Canvas
 
+                // Dim outside crop
                 val path = Path().apply {
                     addRect(Rect(0f, 0f, size.width, size.height))
                     addRect(r)
@@ -189,12 +193,14 @@ fun CropEditorScreen(
                 }
                 drawPath(path, Color.Black.copy(alpha = 0.6f))
 
+                // Crop border
                 drawRect(
                     Color.White, topLeft = Offset(r.left, r.top),
                     size = Size(r.width, r.height),
                     style = Stroke(width = 2.dp.toPx())
                 )
 
+                // Rule of thirds
                 val w3 = r.width / 3f; val h3 = r.height / 3f
                 for (i in 1..2) {
                     drawLine(Color.White.copy(alpha = 0.3f),
@@ -203,14 +209,19 @@ fun CropEditorScreen(
                         Offset(r.left, r.top + h3*i), Offset(r.right, r.top + h3*i), strokeWidth = 0.5f)
                 }
 
+                // Corner handles
                 val hl = 28.dp.toPx(); val hw = 4.dp.toPx()
                 val hc = Color(0xFF80DEEA)
+                // TL
                 drawLine(hc, Offset(r.left, r.top), Offset(r.left+hl, r.top), strokeWidth = hw)
                 drawLine(hc, Offset(r.left, r.top), Offset(r.left, r.top+hl), strokeWidth = hw)
+                // TR
                 drawLine(hc, Offset(r.right, r.top), Offset(r.right-hl, r.top), strokeWidth = hw)
                 drawLine(hc, Offset(r.right, r.top), Offset(r.right, r.top+hl), strokeWidth = hw)
+                // BL
                 drawLine(hc, Offset(r.left, r.bottom), Offset(r.left+hl, r.bottom), strokeWidth = hw)
                 drawLine(hc, Offset(r.left, r.bottom), Offset(r.left, r.bottom-hl), strokeWidth = hw)
+                // BR
                 drawLine(hc, Offset(r.right, r.bottom), Offset(r.right-hl, r.bottom), strokeWidth = hw)
                 drawLine(hc, Offset(r.right, r.bottom), Offset(r.right, r.bottom-hl), strokeWidth = hw)
             }
