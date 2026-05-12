@@ -8,6 +8,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import com.neetquest.neetquestsaver.service.ScreenCaptureService
 
+/**
+ * Transparent activity launched by the floating bubble.
+ * 1. Requests MediaProjection permission
+ * 2. Starts ScreenCaptureService
+ * 3. Opens CropEditorActivity
+ */
 class CaptureRequestActivity : ComponentActivity() {
 
     private val projectionManager by lazy {
@@ -18,8 +24,10 @@ class CaptureRequestActivity : ComponentActivity() {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            // Start capture service with the permission result
             ScreenCaptureService.startCapture(this, result.resultCode, result.data!!)
 
+            // Small delay so service captures the frame, then open crop editor
             android.os.Handler(mainLooper).postDelayed({
                 val cropIntent = Intent(this, CropEditorActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
